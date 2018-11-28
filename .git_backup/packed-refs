@@ -1,0 +1,6 @@
+# pack-refs with: peeled fully-peeled 
+9935490c7053f33d6185efc5e49a07390959752e refs/remotes/origin/master
+d1a13ba50bdc1de692a5c25e6f6cd86649fefa81 refs/remotes/origin/site_tl_launch
+c7f0aed1fc2254404f1840e62d08d5a5e1ce9aa1 refs/tags/v1.1
+00f57c56c0d87b2eb19681db9a0a893c5266688a refs/tags/v1.2
+dfc7d7bb8fde30a603665feb774081c3de867ed0 refs/tags/v1.3
