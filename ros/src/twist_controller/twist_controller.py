@@ -25,6 +25,8 @@ class Controller(object):
         self.vehicle_mass = kwargs['vehicle_mass']
         self.fuel_capacity = kwargs['fuel_capacity']
 
+        self.brake_tourque_const = (self.vehicle_mass + self.fuel_capacity * GAS_DENSITY) * self.wheel_radius
+
         self.tau = 0.5
         self.ts = 0.02
 
@@ -38,6 +40,7 @@ class Controller(object):
         self.steering_controller = PID(kp=0.5, ki=0.05, kd=0.1, mn=-self.max_steer_angle, mx=self.max_steer_angle)
 
         self.vel_lpf = LowPassFilter(tau=self.tau, ts=self.ts)
+        self.steer_lpf = LowPassFilter(tau=3, ts=1)
 
         self.last_time = rospy.get_time()
 
@@ -48,15 +51,14 @@ class Controller(object):
         if not dbw_enabled:
             rospy.logwarn("DBW NOT ENABLED")
             self.throttle_controller.reset()
-            self.throttle_controller.reset()
             return 0., 0., 0.
 
         current_vel = self.vel_lpf.filt(current_vel)
 
         steering = self.yaw_controller.get_steering(linear_vel, angular_vel, current_vel)
+        steering = self.steer_lpf.filt(steering)
 
         vel_error = linear_vel - current_vel
-        self.last_vel = current_vel
 
         current_time = rospy.get_time()
         sample_time = current_time - self.last_time
@@ -71,6 +73,7 @@ class Controller(object):
         elif throttle < 0.1 and vel_error < 0:
             throttle = 0
             decel = max(vel_error, self.decel_limit)
-            brake = abs(decel) * self.vehicle_mass * self.wheel_radius
+            # brake = abs(decel) * self.vehicle_mass * self.wheel_radius
+            brake = self.brake_tourque_const * decel if decel > self.brake_deadband else 0.
 
         return throttle, brake, steering
