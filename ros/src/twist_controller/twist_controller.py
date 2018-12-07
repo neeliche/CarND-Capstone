@@ -46,6 +46,8 @@ class Controller(object):
         # Return throttle, brake, steer
 
         if not dbw_enabled:
+            rospy.logwarn("DBW NOT ENABLED")
+            self.throttle_controller.reset()
             self.throttle_controller.reset()
             return 0., 0., 0.
 
