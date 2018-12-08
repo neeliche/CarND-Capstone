@@ -40,7 +40,7 @@ class Controller(object):
         self.steering_controller = PID(kp=0.5, ki=0.05, kd=0.1, mn=-self.max_steer_angle, mx=self.max_steer_angle)
 
         self.vel_lpf = LowPassFilter(tau=self.tau, ts=self.ts)
-        self.steer_lpf = LowPassFilter(tau=3, ts=1)
+        self.steer_lpf = LowPassFilter(tau=2, ts=1)
 
         self.last_time = rospy.get_time()
 
@@ -74,6 +74,8 @@ class Controller(object):
             throttle = 0
             decel = max(vel_error, self.decel_limit)
             # brake = abs(decel) * self.vehicle_mass * self.wheel_radius
-            brake = self.brake_tourque_const * decel if decel > self.brake_deadband else 0.
+            brake = abs(decel) * self.brake_tourque_const if abs(decel) > self.brake_deadband else 0.
+            # brake = abs(decel) * self.brake_tourque_const
 
+        rospy.logwarn("Throttle = {}; Brake = {}; Steering = {}".format(throttle, brake, steering))
         return throttle, brake, steering
