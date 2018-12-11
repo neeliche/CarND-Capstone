@@ -147,7 +147,8 @@ class TLDetector(object):
         if self.pose:
             car_wp_index = self.get_closest_waypoint(self.pose.pose.position.x, self.pose.pose.position.y)
 
-            # TODO find the closest visible traffic light (if one exists)
+            # TODO: Once the lights are found, see if they are within a "To brake" distance.
+
             diff = len(self.waypoints)
             # rospy.loginfo("Waypoints length {}".format(diff))
             for i, light in enumerate(self.lights):
@@ -155,6 +156,7 @@ class TLDetector(object):
                 temp_wp_index = self.get_closest_waypoint(line[0], line[1])
                 d = temp_wp_index - car_wp_index
                 # Find the closest stop light's waypoint index
+                # No need to start braking a mile away. TODO: Update this section.
                 if 0 <= d < diff:
                     diff = d
                     closest_light = light
